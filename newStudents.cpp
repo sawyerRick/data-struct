@@ -25,17 +25,11 @@ typedef struct student
 	struct student * next;
 }studentRecord;
 
-struct
+struct table
 {
 	studentRecord record;
 	float total;
 }Stu[MAXSIZE];
-
-struct
-{
-	char name[20];
-	float total;
-}scoreTable[MAXSIZE];
 studentRecord * createHead();
 void doListAll(studentRecord * pHead);
 void doFree(studentRecord * pHead);
@@ -92,8 +86,16 @@ studentRecord * createHead()
 
 void doListAll(studentRecord * pHead)
 {
+	if(pHead->next == NULL)
+	{
+		printf("[!] 尚无学生信息录入系统!!!\n");
+		autoRandomInit(pHead);
+		return;
+	}
+
 	pHead = pHead->next;//跳过头结点
 	int item = 0;
+
     while(pHead)
     {
 		item++;
@@ -146,7 +148,7 @@ void doDelete(studentRecord * pHead)
 	int n;
     int i = 1;
 	printf("需要删除第几个结点？\n");
-	scanf_s("%d", &n);
+	scanf("%d", &n);
 	if(n <=0 || n > getLength(pHead))
 	{
 		printf("输入错误..");
@@ -155,20 +157,19 @@ void doDelete(studentRecord * pHead)
     while(pHead)
     {
         pMove = pMove->next;
-        if(n == 1)
+        if(i == n)
         {
-            prior = pHead->next;
-			pHead->next = pHead->next->next;
-            free(prior);
-            printf("已删除第%d个元素\n", i);
-            return ;
-        }
-        else if(i == n)
-        {
-            prior->next = pMove->next;
+            printf("[*] 正在删除第%d个学生信息...\n", i);
+			printf("[-] 已删除学生:");
+			printf("name : %-10s  ", pMove->name);
+			printf("id : %-10s  ", pMove->stuNo);
+			printf("age : %-5d  ", pMove->age);
+			printf("English : %-5.2f  ", pMove->English);
+			printf("Math : %-5.2f  ", pMove->math);
+			printf("Physics : %-5.2f\n", pMove->physics);
+			prior->next = pMove->next;
             free(pMove);
-            printf("已删除第%d个元素\n", i);
-            return ;
+			return ;
         }
         prior = pMove;
         i++;
@@ -196,17 +197,17 @@ void doInsert(studentRecord * pHead)
     }
 	initData(pNew);
 	printf("[+] 请输入name:");
-	scanf_s("%s", pNew->name);
+	scanf("%s", pNew->name);
 	printf("[+] 请输入id:");
-	scanf_s("%s", pNew->stuNo);
+	scanf("%s", pNew->stuNo);
 	printf("[+] 请输入age:");
-	scanf_s("%d", &pNew->age);
+	scanf("%d", &pNew->age);
 	printf("[+] 请输入English成绩:");
-	scanf_s("%f", &pNew->English);
+	scanf("%f", &pNew->English);
 	printf("[+] 请输入math成绩:");
-	scanf_s("%f", &pNew->math);
+	scanf("%f", &pNew->math);
 	printf("[+] 请输入physics成绩:");
-	scanf_s("%f", &pNew->physics);
+	scanf("%f", &pNew->physics);
 	pHead->next = pNew;
 }
 
@@ -273,21 +274,21 @@ void doChoice(int choice, studentRecord * pHead)
 int getChoice()
 {
 	int choice;
-	scanf_s("%d", &choice);
+	scanf("%d", &choice);
 	return choice;
 }
 
 int init(studentRecord * pHead)
 {
-	FILE * fp;
-	int err = fopen_s(&fp, "txl.txt", "rb");
+	FILE * fp = fopen("txl.txt", "rb");
 	studentRecord * pNew = NULL;
 	int count = 0;
 	if(fp == NULL)
 	{
-		printf("[!] 数据库暂无数据...正在自动随机初始化学生管理系统...\n请按任意键继续...\n");
+		printf("[!] 数据库暂无数据...\n[!] 正在自动随机初始化学生管理系统...\n");
 		autoRandomInit(pHead);
 		system("pause > nul");
+		printf("[!] 请按任意键继续...");
 		return 1;
 	}
 	else
@@ -317,9 +318,8 @@ int init(studentRecord * pHead)
 
 void save(studentRecord * pHead)
 {
-	FILE * fp;
+	FILE * fp = fopen("txl.txt", "wb");;
 	pHead = pHead->next;//跳过头结点
-	int err = fopen_s(&fp,"txl.txt", "wb");
 	if (fp == NULL)
 	{
 		printf("不能打开txl.txt...已退出程序...\n");
@@ -344,7 +344,7 @@ void doUpdata(studentRecord * pHead)
 	
 	printf("[+] 数据修改模块...\n");
 	printf("[*] 请输入要修改的同学姓名: ");
-	scanf_s("%s", name);
+	scanf("%s", name);
 	getchar();
 
 	while(pHead)
@@ -365,13 +365,13 @@ void doUpdata(studentRecord * pHead)
 			printf("[-] 请修改id:");
 			gets_s(pHead->stuNo);
 			printf("[-] 请修改age:");
-			scanf_s("%d", &pHead->age);
+			scanf("%d", &pHead->age);
 			printf("[-] 请修改English成绩:");
-			scanf_s("%f", &pHead->English);
+			scanf("%f", &pHead->English);
 			printf("[-] 请修改math成绩:");
-			scanf_s("%f", &pHead->math);
+			scanf("%f", &pHead->math);
 			printf("[-] 请修改physics成绩:");
-			scanf_s("%f", &pHead->physics);
+			scanf("%f", &pHead->physics);
 		}
 		pHead = pHead->next;
 	}
@@ -400,7 +400,7 @@ int doAddup(studentRecord * pHead)
         pHead = pHead->next;
 		i++;
     }
-	printf("[+] 成绩统计完成...\n");
+	printf("[!] 成绩统计完成...\n");
 	return i;
 }
 
@@ -421,7 +421,7 @@ void autoRandomInit(studentRecord * pHead)
 	int j = -1;
 	char names[][10] = {"Wright", "Jackson", "White", "Harris", "Martin", "Thompson", "Clark", "Lee", "Green", "Turner"};
     studentRecord * pNew = NULL;
-	printf("[+] 正在随机初始化学生信息...\n");
+	printf("[+] 正在随机初始化一批学生信息...\n");
     while(i < 8)
     {
         pNew = (studentRecord *)malloc(sizeof(studentRecord));
@@ -448,12 +448,18 @@ void autoRandomInit(studentRecord * pHead)
 
 void showScoreTable(int len)
 {
-	printf("[+] 成绩表查看模块...\n");
+	printf("[*] 成绩表查看模块...\n");
 	sortMenu(len);
 	int i = 0;
     while(i < len)
     {
-		printf("[+]  name: %-10s total = %-5.2f\n", Stu[i].record.name, Stu[i].total);
+		printf("name : %-10s  ", Stu[i].record.name);
+		printf("total : %-5.2f  ", Stu[i].total);
+		printf("id : %-10s  ", Stu[i].record.stuNo);
+		printf("age : %-5d  ", Stu[i].record.age);
+		printf("English : %-5.2f  ", Stu[i].record.English);
+		printf("Math : %-5.2f  ", Stu[i].record.math);
+		printf("Physics : %-5.2f\n", Stu[i].record.physics);
 		i++;
     }
 }
@@ -466,7 +472,7 @@ void doUdScore(studentRecord * pHead)
 
 	printf("[+] 成绩修改模块...\n");
 	printf("[*] 请输入要修改的同学姓名: ");
-	scanf_s("%s", name);
+	scanf("%s", name);
 	getchar();
 
 	while (pHead)
@@ -483,11 +489,11 @@ void doUdScore(studentRecord * pHead)
 			printf("Physics : %f\n", pHead->physics);
 			printf("[-] 请修改...\n");
 			printf("[-] 请修改English成绩:");
-			scanf_s("%f", &pHead->English);
+			scanf("%f", &pHead->English);
 			printf("[-] 请修改math成绩:");
-			scanf_s("%f", &pHead->math);
+			scanf("%f", &pHead->math);
 			printf("[-] 请修改physics成绩:");
-			scanf_s("%f", &pHead->physics);
+			scanf("%f", &pHead->physics);
 		}
 		pHead = pHead->next;
 	}
@@ -509,9 +515,16 @@ void sortMenu(int len)
 	printf("\t1.选择排序\n");
 	printf("\t2.插入排序\n");
 	printf("\t3.冒泡排序\n");
-	printf("==========================\n.");
-	printf("请输入你的选择(0-3)：");
-	scanf_s("%d", &choice);
+	printf("==========================\n");
+	printf("[*] 请输入你的选择(1-3)：");
+	do
+	{
+		scanf("%d", &choice);
+		if(choice < 1 || choice > 3)
+		{
+			printf("[!] 输入错误...请重新输入(1-3):");
+		}
+	}while(choice < 1 || choice > 3);
 
 	switch (choice)
 	{
@@ -529,27 +542,24 @@ void sortMenu(int len)
 
 void bubleSort(int len)
 {
-	int i, j, k, temp;
+	int i, j, temp;
+	studentRecord tempTable;
 	char tempName[10];
 
-	for (i = 0; i < len; i++)
+	for (i = 0; i < len - 1; i++)
 	{
-		for (j = i + 1; j < len; j++)
+		for (j = 0; j < len - 1 - i; j++)
 		{
-			if (Stu[i].total > Stu[j].total)
+			if (Stu[j].total < Stu[j + 1].total)
 			{
-				k = -1;
-				temp = Stu[i].total;
-				Stu[i].total = Stu[j].total;
-				Stu[j].total = temp;
+				temp = Stu[j].total;
+				tempTable = Stu[j].record;
 
-				do
-				{
-					k++;
-					tempName[k] = Stu[i].record.name[k];
-					Stu[i].record.name[k] = Stu[j].record.name[k];
-					Stu[j].record.name[k] = tempName[k];
-				} while (Stu[j].record.name[k] != '\0');
+				Stu[j].total = Stu[j + 1].total;
+				Stu[j].record = Stu[j + 1].record;
+
+				Stu[j + 1].total = temp;
+				Stu[j + 1].record = tempTable;
 			}
 		}
 	}
@@ -557,7 +567,46 @@ void bubleSort(int len)
 
 void selectSort(int len)
 {
+	int i, j, temp;
+	studentRecord tempTable;
+	char tempName[10];
 
+	for (i = 0; i < len; i++)
+	{
+		for (j = i + 1; j < len; j++)
+		{
+			if (Stu[i].total < Stu[j].total)
+			{
+				temp = Stu[i].total;
+				tempTable = Stu[i].record;
+
+				Stu[i].total = Stu[j].total;
+				Stu[i].record = Stu[j].record;
+
+				Stu[j].total = temp;
+				Stu[j].record = tempTable;
+			}
+		}
+	}
 }	
+
 void insertSort(int len)
-{}
+{
+	int i, j, temp;
+	studentRecord tempTable;
+
+	for(i = 1; i < len; i++)
+	{
+		temp = Stu[i].total;
+		tempTable = Stu[i].record;
+		j = i - 1;
+		while(j >= 0 && temp > Stu[j].total)
+		{
+			Stu[j + 1].total = Stu[j].total;
+			Stu[j + 1].record = Stu[j].record;
+			j--;
+		}
+		Stu[j + 1].total = temp;
+		Stu[j + 1].record = tempTable;
+	}
+}
