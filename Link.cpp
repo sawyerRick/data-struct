@@ -158,15 +158,15 @@ void query_n(Link * pHead)
     }
 }
 
-void deleteLink(Link ** pHead)
+void deleteLink(Link * pHead)
 {
-    Link * prior = *pHead;
-    Link * pMove = *pHead;
+    Link * prior = pHead;
+    Link * pMove = pHead;
 	int n;
     int i = 1;
 	printf("需要删除第几个结点？\n");
 	scanf("%d", &n);
-	if(n <=0 || n > length(*pHead))
+	if(n <=0 || n > length(pHead))
 	{
 		printf("输入错误..");
 		return;
@@ -176,7 +176,8 @@ void deleteLink(Link ** pHead)
         pMove = pMove->next;
         if(n == 1)
         {
-            *pHead = (*pHead)->next;
+            prior = pHead->next;
+			pHead->next = pHead->next->next;
             free(prior);
             printf("已删除第%d个元素\n", i);
 			system("pause > nul");
@@ -283,7 +284,7 @@ void doChoice(int choice, Link * pHead)
 		query_n(pHead->next);
 		break;
 	case DELETE:
-		deleteLink(&pHead);
+		deleteLink(pHead);
 		break;
 	case LIST:
 		showLink(pHead->next);

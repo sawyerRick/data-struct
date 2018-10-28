@@ -148,6 +148,7 @@ int freeLinkQueue(LinkQueue * LQ)
 	QueueNode * node = LQ->front;
 	QueueNode * tail = node;
 
+	printf("[-] 正在释放链队列...\n");
 	while(node != NULL)
 	{
 		tail = node;

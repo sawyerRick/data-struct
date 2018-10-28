@@ -196,17 +196,17 @@ void doInsert(studentRecord * pHead)
         pHead = pHead->next;
     }
 	initData(pNew);
-	printf("[+] 请输入name:");
+	printf("[+] 请输入name(string):");
 	scanf("%s", pNew->name);
-	printf("[+] 请输入id:");
+	printf("[+] 请输入id(string):");
 	scanf("%s", pNew->stuNo);
-	printf("[+] 请输入age:");
+	printf("[+] 请输入age(int):");
 	scanf("%d", &pNew->age);
-	printf("[+] 请输入English成绩:");
+	printf("[+] 请输入English成绩(float):");
 	scanf("%f", &pNew->English);
-	printf("[+] 请输入math成绩:");
+	printf("[+] 请输入math成绩(float):");
 	scanf("%f", &pNew->math);
-	printf("[+] 请输入physics成绩:");
+	printf("[+] 请输入physics成绩(float):");
 	scanf("%f", &pNew->physics);
 	pHead->next = pNew;
 }
@@ -287,8 +287,8 @@ int init(studentRecord * pHead)
 	{
 		printf("[!] 数据库暂无数据...\n[!] 正在自动随机初始化学生管理系统...\n");
 		autoRandomInit(pHead);
+		printf("[!] 请按任意键继续...\n");
 		system("pause > nul");
-		printf("[!] 请按任意键继续...");
 		return 1;
 	}
 	else
@@ -353,25 +353,27 @@ void doUpdata(studentRecord * pHead)
 		{
 			isFound = 1;
 			printf("[+] 同学信息如下:\n");
-			printf("name : %s ", pHead->name);
-			printf("id : %s ", pHead->stuNo);
-			printf("age : %d ", pHead->age);
-			printf("English : %f ", pHead->age);
-			printf("Math : %f ", pHead->math);
-			printf("Physics : %f\n", pHead->physics);
+			printf("name : %-10s  ", pHead->name);
+			printf("id : %-10s  ", pHead->stuNo);
+			printf("age : %-5d  ", pHead->age);
+			printf("English : %-5.2f  ", pHead->English);
+			printf("Math : %-5.2f  ", pHead->math);
+			printf("Physics : %-5.2f\n", pHead->physics);
 			printf("[-] 请修改...\n");
-			printf("[-] 请修改name:");
+			printf("[-] 请修改name(string):");
 			gets_s(pHead->name);
-			printf("[-] 请修改id:");
+			printf("[-] 请修改id(string):");
 			gets_s(pHead->stuNo);
-			printf("[-] 请修改age:");
+			printf("[-] 请修改age(int):");
 			scanf("%d", &pHead->age);
-			printf("[-] 请修改English成绩:");
+			printf("[-] 请修改English成绩(float):");
 			scanf("%f", &pHead->English);
-			printf("[-] 请修改math成绩:");
+			printf("[-] 请修改math成绩(float):");
 			scanf("%f", &pHead->math);
-			printf("[-] 请修改physics成绩:");
+			printf("[-] 请修改physics成绩(float):");
 			scanf("%f", &pHead->physics);
+			printf("姓名为%s的同学的信息已经成功修改！\n", name);
+			return;
 		}
 		pHead = pHead->next;
 	}
@@ -379,10 +381,6 @@ void doUpdata(studentRecord * pHead)
 	if (!isFound)
 	{
 		printf("抱歉，姓名为%s的同学还没登入同学录中.\n", name);
-	}
-	else
-	{
-		printf("姓名为%s的同学的信息已经成功修改！\n", name);
 	}
 }
 
@@ -471,7 +469,7 @@ void doUdScore(studentRecord * pHead)
 	int isFound = 0;
 
 	printf("[+] 成绩修改模块...\n");
-	printf("[*] 请输入要修改的同学姓名: ");
+	printf("[*] 请输入要修改的同学姓名(string): ");
 	scanf("%s", name);
 	getchar();
 
@@ -488,12 +486,14 @@ void doUdScore(studentRecord * pHead)
 			printf("Math : %f ", pHead->math);
 			printf("Physics : %f\n", pHead->physics);
 			printf("[-] 请修改...\n");
-			printf("[-] 请修改English成绩:");
+			printf("[-] 请修改English成绩(float):");
 			scanf("%f", &pHead->English);
-			printf("[-] 请修改math成绩:");
+			printf("[-] 请修改math成绩(float):");
 			scanf("%f", &pHead->math);
-			printf("[-] 请修改physics成绩:");
+			printf("[-] 请修改physics成绩(float):");
 			scanf("%f", &pHead->physics);
+			printf("姓名为%s的同学的信息已经成功修改！\n", name);
+			return;
 		}
 		pHead = pHead->next;
 	}
@@ -501,10 +501,6 @@ void doUdScore(studentRecord * pHead)
 	if (!isFound)
 	{
 		printf("抱歉，姓名为%s的同学还没登入同学录中.\n", name);
-	}
-	else
-	{
-		printf("姓名为%s的同学的信息已经成功修改！\n", name);
 	}
 }
 
