@@ -15,7 +15,7 @@
 
 typedef struct student
 {
-	char stuNo[10];  //学号
+	char stuNo[20];  //学号
 	char name[20];  //姓名
 	int  age;       //年龄
 	float math;     //数学
