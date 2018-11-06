@@ -16,12 +16,11 @@ void preOrder(Node * node);
 void inOrder(Node * node);
 void postOrder(Node * node);
 void levelOrder(Node * node);
-void noRecursiveInOrder(Node * node);
 
 int main()
 {
-	elemtype shit[] = {0, 1, 2, 3, 4, 5, 6, 7};
-	Node * root = initBitTree(shit, sizeof(shit) / sizeof(int) - 1);
+	elemtype bitTree[] = {0, 1, 2, 3, 4, 5, 6, 7};//初始化完全二叉树
+	Node * root = initBitTree(bitTree, sizeof(bitTree) / sizeof(elemtype) - 1);
 	printf("递归遍历...\n");
 	printf("[+] 先序遍历:");
 	preOrder(root);
@@ -35,8 +34,6 @@ int main()
 	printf("[+] 层序遍历:");
 	levelOrder(root);
 	printf("\n");
-	printf("[+] 非递归中序遍历:");
-	noRecursiveInOrder(root);
 
 	return 0;
 }
@@ -138,33 +135,4 @@ void levelOrder(Node * node)
 			nodeQueue[rear] = nodeQueue[front]->rchild;
 		}
 	}
-}
-
-void noRecursiveInOrder(Node * node)
-{
-	Node * nodeStack[MAXSIZE];
-	int top = -1;
-	nodeStack[++top] = node;
-
-	do
-	{
-		while (node->lchild != NULL)
-		{
-			nodeStack[++top] = node;
-			node = node->lchild;
-		}
-		if(top == -1)
-		{
-			return ;
-		}
-		else
-		{
-			printf("%d  ", node->data);
-			node = nodeStack[--top];
-			if (node->rchild != NULL)
-			{
-				node = node->rchild;
-			}
-		}
-	}while (top != -1);
 }
