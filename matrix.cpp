@@ -25,6 +25,7 @@ typedef struct
 TSMatrix * initMatrix();
 void displayMatrix(TSMatrix * matrix);
 void displayTripleTable(TSMatrix * matrix);
+void newTranspose(TSMatrix * matrix);
 TSMatrix * transpose(TSMatrix * matrix);
 void addMatrix(TSMatrix * matrix1, TSMatrix * matrix2);
 
@@ -32,6 +33,10 @@ int main()
 {
 	printf("请初始化矩阵1...\n");
 	TSMatrix * matrix1 = initMatrix();
+	displayMatrix(matrix1);
+	newTranspose(matrix1);
+	displayMatrix(matrix1);
+	/*
 	printf("矩阵1转置前:\n");
 	displayMatrix(matrix1);
 	printf("矩阵1转置后:\n");
@@ -50,7 +55,7 @@ int main()
 	printf("    +\n");
 	displayMatrix(matrix1);
 	printf("    =\n");
-	addMatrix(matrix1, matrix2);
+	addMatrix(matrix1, matrix2);*/
 
 	return 0;
 }
@@ -209,5 +214,16 @@ void addMatrix(TSMatrix * matrix1, TSMatrix * matrix2)
 			}
 		}
 		printf("\n");
+	}
+}
+
+void newTranspose(TSMatrix * matrix)
+{
+	int temp = 0;
+	for (int i = 0; i <= matrix->nonZero; i++)
+	{
+		temp = matrix->data[i].i;
+		matrix->data[i].i = matrix->data[i].j;
+		matrix->data[i].j = temp;
 	}
 }

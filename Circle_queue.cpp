@@ -1,125 +1,119 @@
+//(牺牲一块内存空间的)(rear指向的那一块空间)循环队列CirQueue(不会假溢出)
+//单个数据类型的队列
+//不能放字符串
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAXSIZE 4
-typedef int elemtype;
+#define CirQueueMAXSIZE 1000
+typedef int CirQueueElemtype;
 typedef struct
 {
-	elemtype data[MAXSIZE];
+	CirQueueElemtype data[CirQueueMAXSIZE];
 	int front;
 	int rear;
-}CircleQueue;
+}CirQueue;
 
-CircleQueue * initQueue();
-int isEmpty(CircleQueue * queue);
-int isFull(CircleQueue * queue);
-int getLength(CircleQueue * queue);
-int enterQueue(CircleQueue * queue, elemtype x);
-int deQueue(CircleQueue * queue, elemtype * x);
-int freeQueue(CircleQueue * queue);
-void showQueue(CircleQueue * queue);
+CirQueue * initQueue();
+int isEmpty(CirQueue * queue);
+int isFull(CirQueue * queue);
+int getCirQueueLen(CirQueue * queue);
+int enQueue(CirQueue * queue, CirQueueElemtype x);
+int deQueue(CirQueue * queue, CirQueueElemtype * x);
+int freeCirQueue(CirQueue * queue);
+void printCirQueue(CirQueue * queue);
 
 int main()
 {
 	int i = 0;
-	elemtype x = 0;
-	CircleQueue * queue = initQueue();
-	for(; i < 4; i++)
-	{
-		enterQueue(queue, i);
-	}
-	showQueue(queue);
-	for(i = 0; i < 4; i++)
-	{
-		deQueue(queue, &x);
-	}
-	showQueue(queue);
+	CirQueueElemtype x = 0;
+	CirQueue * queue = initQueue();
+	enQueue(queue, 100);
+	enQueue(queue, 99);
+	printCirQueue(queue);
+	deQueue(queue, &x);
+	printCirQueue(queue);
 
 	return 0;
 }
 
-CircleQueue * initQueue()
+CirQueue * initQueue()
 {
-	CircleQueue * queue = (CircleQueue *)malloc(sizeof(CircleQueue));
-	if(queue != NULL)
-	{
-		printf("[+] 初始化队列成功...\n");
-		queue->rear = 0;
-		queue->front = 0;
-		return queue;
-	}
-	printf("[-] 初始化队列失败...\n");
-	return 0;
+	CirQueue * queue = (CirQueue *)malloc(sizeof(CirQueue));
+	queue->rear = 0;
+	queue->front = 0;
+
+	return queue;
 }
 
-int isEmpty(CircleQueue * queue)
+int isEmpty(CirQueue * queue)
 {
+	//判断循环队列为空, 当头尾相等
 	if(queue->front == queue->rear)
 	{
 		return 1;
 	}
-	return 0;
+	else
+	{
+		return 0;
+	}
 }
 
-int isFull(CircleQueue * queue)
+int isFull(CirQueue * queue)
 {
-	if(queue->front == (queue->rear + 1) % MAXSIZE)
+	//判断队列为满
+	if(queue->front == (queue->rear + 1) % CirQueueMAXSIZE)
 	{
 		return 1;
 	}
 	return 0;
 }
 
-int getLength(CircleQueue * queue)
+int getCirQueueLen(CirQueue * queue)
 {
-	int len = (queue->rear - queue->front + MAXSIZE) % MAXSIZE;
-	printf("[+] 队列长度为: %d \n", len);
+	int len = (queue->rear - queue->front + CirQueueMAXSIZE) % CirQueueMAXSIZE;
+
 	return len;
 }
 
-int enterQueue(CircleQueue * queue, elemtype x)
+int enQueue(CirQueue * queue, CirQueueElemtype x)
 {
 	if(isFull(queue))
 	{
-		printf("[!] 队列为满...不能入队\n");
-		return 0;
+		return 1;
 	}
 	else
 	{
 		queue->data[queue->rear] = x;
-		printf("[+] inde: %d data: %d 入队成功...\n", queue->rear, x);
-		queue->rear = (queue->rear + 1) % MAXSIZE;
+		queue->rear = (queue->rear + 1) % CirQueueMAXSIZE;
 		return 0;
 	}
 }
 
-int deQueue(CircleQueue * queue, elemtype * x)
+int deQueue(CirQueue * queue, CirQueueElemtype * x)
 {
 	if(isEmpty(queue))
 	{
-		printf("[!] 队为空...出队失败...\n");
-		return 0;
+		return 1;
 	}
 	else
 	{
 		*x = queue->data[queue->front];
-		printf("[+] index: %d data:%d 出队成功...\n", queue->front, *x);
-		queue->front = (queue->front + 1) % MAXSIZE;
+		queue->front = (queue->front + 1) % CirQueueMAXSIZE;
 		return 0;
 	}
 }
 
-int freeQueue(CircleQueue * queue)
+int freeCirQueue(CirQueue * queue)
 {
-	printf("[+] 释放队列...\n");
 	free(queue);
+
 	return 0;
 }
 
-void showQueue(CircleQueue * queue)
+void printCirQueue(CirQueue * queue)
 {
-	int index = 0;
-	int i = 0;
+	int i = queue->front;
+	printf("<CirQueue> max: %d front:%d rear:%d\n", CirQueueMAXSIZE, queue->front, queue->rear);
 	if(isEmpty(queue))
 	{
 		printf("[!] 队列为空...不能输出...\n");
@@ -128,7 +122,8 @@ void showQueue(CircleQueue * queue)
 	{
 		for (; i < queue->rear; i++)
 		{
-			printf("[+] index: %d data: %d\n", queue->front + i, queue->data[queue->front + i]);
+			printf("%d\t", queue->data[i]);
 		}
 	}
+	printf("\n");
 }

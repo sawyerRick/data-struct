@@ -1,11 +1,11 @@
 // 二叉树的创建，先序，中序，后序，层次遍历，找出权值绝对值相差最大的两个节点
-// 创建只适用于完全二叉树(不能输入空节点)
+// 创建只适用于完全二叉树(输入#为空节点)
 
 #include <stdio.h>
 #include <stdlib.h>
 #include<math.h>
 
-typedef int elemtype;
+typedef char elemtype;
 #define MAXSIZE 100
 typedef struct bitTree
 {
@@ -19,8 +19,7 @@ void preOrder(Node * node);
 void inOrder(Node * node);
 void postOrder(Node * node);
 void levelOrder(Node * node);
-elemtype maxDiff(Node * node);
-int findDiffValuePreOrder(Node * node, int * max, int * min);
+elemtype findDiffValuePreOrder(Node * node, elemtype * max, elemtype * min);
 
 int main()
 {
@@ -28,17 +27,18 @@ int main()
 	int len = 0;
 	printf("请输入权值个数:");
 	scanf("%d", &len);
-	printf("请输入权值:");
+	printf("请输入权值(完全二叉树形式按层遍历顺序输入，#为空值):");
 	for (int i = 0; i < len; i++)
 	{
-		scanf("%d", &weightArray[i]);
+		getchar();
+		scanf("%c", &weightArray[i]);
 	}
 	
-	int max = weightArray[0], min = weightArray[0];
-	int dValue = 0, * ptrMax = &max, * ptrMin = &min;
+	elemtype max = weightArray[0], min = weightArray[0];
+	elemtype dValue = 0, * ptrMax = &max, * ptrMin = &min;
 	
 	
-	Node * root = initBitTree(weightArray, len);
+	Node * root = initBitTree(weightArray, len - 1 );
 	printf("先序遍历找最大差绝对值:");
 	dValue = findDiffValuePreOrder(root, ptrMax, ptrMin);
 	printf("\ndValue:%d\n", dValue);
@@ -70,17 +70,18 @@ void creatNode(elemtype * arry, int length, Node * treeNode, int nodeIndex)
 	}
 
 	//左子树:2 * nodeIndex + 1
-	if (2 * nodeIndex + 1 < length)
+	if (2 * nodeIndex + 1 <= length && arry[2 * nodeIndex + 1] != '#')
 	{
 		treeNode->lchild = (Node *)malloc(sizeof(Node));
 		treeNode->lchild->weight = arry[2 * nodeIndex + 1];
 	}
+	//左子树为空
 	else
 	{
 		treeNode->lchild = NULL;
 	}
 	//右子树:2 * nodeIndex + 1
-	if (2 * nodeIndex + 2 < length)
+	if (2 * nodeIndex + 2 <= length && arry[2 * nodeIndex + 2] != '#')
 	{
 		treeNode->rchild = (Node *)malloc(sizeof(Node));
 		treeNode->rchild->weight = arry[2 * nodeIndex + 2];
@@ -133,7 +134,7 @@ void postOrder(Node * node)
 	{
 		postOrder(node->lchild);
 		postOrder(node->rchild);
-		printf("%d  ", node->weight);
+		printf("%c  ", node->weight);
 	}
 }
 
@@ -147,7 +148,7 @@ void levelOrder(Node * node)
 	while (front != rear)
 	{
 		front++;
-		printf("%d  ", nodeQueue[front]->weight);
+		printf("%c  ", nodeQueue[front]->weight);
 		if (nodeQueue[front]->lchild != NULL)
 		{
 			rear++;
@@ -161,11 +162,11 @@ void levelOrder(Node * node)
 	}
 }
 
-int findDiffValuePreOrder(Node * node, int * max, int * min)
+elemtype findDiffValuePreOrder(Node * node, elemtype * max, elemtype * min)
 {
 	if (node != NULL)
 	{
-		printf("%d  ", node->weight);
+		printf("%c  ", node->weight);
 		if (node->weight >= *max) {
 			*max = node->weight;
 			//printf("max:%d\n", *max);
