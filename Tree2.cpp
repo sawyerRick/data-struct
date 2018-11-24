@@ -15,11 +15,11 @@ typedef struct bitTree
 
 void creatNode(elemtype * arry,int length, Node * treeNode, int nodeIndex);
 Node * initBitTree(elemtype * arry, int length);
-void preOrder(Node * node);
-void inOrder(Node * node);
-void postOrder(Node * node);
-void levelOrder(Node * node);
-elemtype findDiffValuePreOrder(Node * node, elemtype * max, elemtype * min);
+void preOrder(Node * node);//先序递归遍历
+void inOrder(Node * node);//中序递归遍历
+void postOrder(Node * node);//后序递归遍历
+void levelOrder(Node * node);//层次遍历
+elemtype findDiffValuePreOrder(Node * node, elemtype * max, elemtype * min);//找权值绝对值相差最大的两个节点的值
 
 int main()
 {
@@ -42,22 +42,6 @@ int main()
 	printf("先序遍历找最大差绝对值:");
 	dValue = findDiffValuePreOrder(root, ptrMax, ptrMin);
 	printf("\ndValue:%d\n", dValue);
-	/*
-	printf("递归遍历...\n");
-	printf("[+] 先序遍历:");
-	preOrder(root);
-	printf("\n");
-	printf("[+] 中序遍历:");
-	inOrder(root);
-	printf("\n");
-	printf("[+] 后序遍历:");
-	postOrder(root);
-	printf("\n");
-	printf("非递归遍历...\n");
-	printf("[+] 层序遍历:");
-	levelOrder(root);
-	printf("\n");
-	*/
 
 	return 0;
 }
