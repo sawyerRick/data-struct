@@ -1,14 +1,18 @@
 //图
 //邻接矩阵MGraph，邻接表ALGraph
 //Prim算法找最小生成树Prim(MGraph * G, int v);
+//dijkstra算法找最短路径
 //广度遍历找离k顶点最远的顶点n, void BFSMFindFurthestVex(MGraph * G, int k, int visited[]);
+//FriendZone找朋友圈数量
 #include <stdio.h>
 #include <stdlib.h>
 #include "Circle_queue.h"
 
 #define MaxVertexNum 99
+#define INF 32767 //无穷大
 typedef char VertexType;//顶点类型
 typedef int EdgeType;//边的权类型
+
 //邻接矩阵MGraph
 typedef struct
 {
@@ -52,19 +56,24 @@ int BFSMFindFurthestVex(MGraph * G, int k);//广度优先找离K顶点最远的顶点
 void Prim(MGraph * G, int v);//Prim算法最小生成树
 void unitInitMGraphWithWeight(MGraph * G);//单元测试初始化带权邻接矩阵
 void unitInitMGraph(MGraph * G);//单元测试初始化不带权邻接矩阵
+void unitInitDirectedMGraphWithWeight(MGraph * G);//单元测试初始化带权有向邻接矩阵
+void dijkstra(MGraph * G, int v);//dijkstra算法最短路径
+void dispath(int dist[], int path[], int foundVexs[],int n, int v);//输出最短路径
+void FriendZone(MGraph * G);//输入无向邻接矩阵，求朋友圈数量(用广度优先遍历)
+void unitInitMGraphToFriendZone(MGraph * G);
 
 int main()
 {
 	//邻接矩阵
 	MGraph * G = (MGraph *)malloc(sizeof(MGraph));
-	printf("---------Prim算法找最小生成树:-----------\n");
-	unitInitMGraphWithWeight(G);
-	Prim(G, 0);
+	//printf("---------Prim算法找最小生成树:-----------\n");
+	//unitInitMGraphWithWeight(G);
+	//Prim(G, 0);
 
-	printf("---------在无向连通图中找离k最远的顶点----------\n");
-	unitInitMGraph(G);
+	//printf("---------在无向连通图中找离k最远的顶点----------\n");
+	//unitInitMGraph(G);
 	//BFSM(G, 0);
-	BFSMFindFurthestVex(G, 0);
+	//BFSMFindFurthestVex(G, 0);
 	
 
 	//CreateMGraphWithWeight(G);
@@ -75,6 +84,16 @@ int main()
 	//ALGraph * ALG = (ALGraph *)malloc(sizeof(ALGraph));
 	//CreateALGraph(ALG);
 	//DFSALIM(ALG);
+
+	//dijkstra最短路径:
+	printf("----------------dijkstra最短路径--------------------\n");
+	unitInitDirectedMGraphWithWeight(G);
+	dijkstra(G, 0);
+
+	//找朋友圈
+	printf("----------------找朋友圈--------------------\n");
+	unitInitMGraphToFriendZone(G);
+	FriendZone(G);
 	free(G);
 
 	return 0;
@@ -160,7 +179,14 @@ void DisplayMGraph(MGraph * G)
 	{
 		for (j = 0; j < G->n; j++)
 		{
-			printf("%-4d", G->edges[i][j]);
+			if(G->edges[i][j] == INF)
+			{
+				printf("∞ ");
+			}
+			else
+			{
+				printf("%-2d ", G->edges[i][j]);
+			}
 		}
 		printf("\n");
 	}
@@ -365,8 +391,8 @@ void unitInitMGraphWithWeight(MGraph * G)
 	{
 		for (int j = 0; j < G->n; j++)
 		{
-			G->edges[i][j] = 99;
-			G->edges[j][i] = 99;
+			G->edges[i][j] = INF;
+			G->edges[j][i] = INF;
 		}
 	}
 	//初始化
@@ -385,21 +411,19 @@ void unitInitMGraph(MGraph * G)
 {
 	//用于测试BFSMFindFurthestVex的不带权邻接矩阵
 	G->n = 5;//顶点数
-	G->e = 5;//边数
+	G->e = 3;//边数
 	VertexType * vexs = "abcde";//测试顶点
-	//测试对应顶点边的权
+	//测试对应顶点的边
 	int xyweight[5][2] = {
 		{1, 2},
 		{0, 1},
-		{2, 3},
-		{0, 3},
-		{2, 4},
+		{3, 4},
 	};
 	for (int i = 0; i < G->n; i++)
 	{
 		G->vexs[i] = vexs[i];
 	}
-	//初始化权值为Max
+	//初始化权值为0
 	for (int i = 0; i < G->n; i++)
 	{
 		for (int j = 0; j < G->n; j++)
@@ -420,3 +444,213 @@ void unitInitMGraph(MGraph * G)
 	DisplayMGraph(G);
 }
 
+void unitInitMGraphToFriendZone(MGraph * G)
+{
+	//用于测试BFSMFindFurthestVex的不带权邻接矩阵
+	G->n = 9;//顶点数
+	G->e = 5;//边数
+	VertexType * vexs = "abcdefghi";//测试顶点
+	//测试对应顶点的边
+	int xyweight[5][2] = {
+		{1, 2},
+		{0, 1},
+		{3, 4},
+		{7, 8},
+		{6, 5},
+	};
+	for (int i = 0; i < G->n; i++)
+	{
+		G->vexs[i] = vexs[i];
+	}
+	//初始化权值为0
+	for (int i = 0; i < G->n; i++)
+	{
+		for (int j = 0; j < G->n; j++)
+		{
+			G->edges[i][j] = 0;
+			G->edges[j][i] = 0;
+		}
+	}
+	//初始化
+	for (int k = 0 ; k < G->e; k++)
+	{
+		int i = xyweight[k][0];
+		int j = xyweight[k][1];
+		G->edges[i][j] = 1;
+		G->edges[j][i] = 1; //无向 对称
+	}
+	printf("测试朋友圈邻接矩阵:\n");
+	DisplayMGraph(G);
+}
+
+void unitInitDirectedMGraphWithWeight(MGraph * G)
+{
+	//用于测试dijkstra最短路径算法的带权有向邻接矩阵
+	G->n = 5;//顶点数
+	G->e = 5;//边数
+	VertexType * vexs = "abcde\0";//测试顶点
+	//测试对应顶点边的权
+	int xyweight[5][3] = {
+		{1, 2, 3},
+		{0, 1, 6},
+		{0, 2, 1},
+		{2, 3, 5},
+		{2, 4, 2},
+	};
+	for (int i = 0; i < G->n; i++)
+	{
+		G->vexs[i] = vexs[i];
+	}
+	//初始化权值为Max
+	for (int i = 0; i < G->n; i++)
+	{
+		for (int j = 0; j < G->n; j++)
+		{
+			G->edges[i][j] = INF;
+			G->edges[j][i] = INF;
+		}
+	}
+	//初始化
+	for (int k = 0 ; k < G->e; k++)
+	{
+		int i = xyweight[k][0];
+		int j = xyweight[k][1];
+		G->edges[i][j] = xyweight[k][2];
+		//G->edges[j][i] = xyweight[k][2]; //无向 对称
+	}
+	printf("测试dijkstra邻接矩阵:\n");
+	DisplayMGraph(G);
+}
+
+void dijkstra(MGraph * G, int v)
+{
+	int dist[MaxVertexNum];//dist[n]保存v到n的距离
+	int path[MaxVertexNum];//path[n]表示 v到n的前一个顶点的index
+	int foundVexs[MaxVertexNum];//保存已经找到的最短路径的顶点
+
+	int mindis;
+	int i;
+	int j;
+	int k;
+
+	//初始化
+	for ( i = 0; i < G->n; i++)
+	{
+		dist[i] = G->edges[v][i];
+		foundVexs[i] = 0;
+		if (G->edges[v][i] < INF)
+		{
+			path[i] = v;
+		}
+		else
+		{
+			path[i] = -1;
+		}
+	}
+	foundVexs[v] = 1;
+	for (i = 0; i < G->n; i++)
+	{
+		mindis = INF;
+		k = v;
+		//从未加入foundVexs中的顶点中找离v最近的
+		for (j = 0; j < G->n; j++)
+		{
+			if (foundVexs[j] == 0 && dist[j] < mindis)
+			{
+				k = j;
+				mindis = dist[j];
+			}
+		}
+		//把离v最小的顶点加入到foundVexs
+		foundVexs[k] = 1;
+		//更新距离
+		for (j = 0; j < G->n; j++)
+		{
+			if (foundVexs[j] == 0 && G->edges[k][j] < INF && dist[k] + G->edges[k][j] < dist[j])
+			{
+				dist[j] = dist[k] + G->edges[k][j];
+				path[j] = k;
+			}
+		}
+	}
+	printf("dijkstra测试矩阵:");
+	dispath(dist, path, foundVexs, G->n, v);
+}
+
+void dispath(int dist[], int path[], int foundVexs[],int n, int v)
+{
+	int i, k;
+
+	for (i = 0; i < n; i++)
+	{
+		if (i == v) //防止V0到V0
+		{
+			continue;
+		}
+		if (foundVexs[i] == 1)
+		{
+			k = i;
+			printf("V%d 到 V%d 的最短路径为:", v, i);
+			while (k != v)
+			{
+				printf("V%d <- ", k);
+				k = path[k];
+			}
+			printf("V%d 路径长度为:%d\n", v, dist[i]);
+		}
+		else
+		{
+			printf("V%d <- V%d 不存在路径\n", i, v);
+		}
+	}
+}
+
+void FriendZone(MGraph * G)
+{
+	//思想:广度优先遍历邻接矩阵
+	//1遍历过的顶点都存入foundVexs
+	//2退出遍历FriendZoneCounter++
+	//3从不在foundVexs里的顶点取顶点，继续1
+	printf("Zone1:\n");
+	int foundVexs[MaxVertexNum] = {0};//找到顶点数组
+	int finder = 1;//找到顶点个数
+	int FriendZoneCounter = 0;
+	int k = 0;
+	int i = 0;
+
+	CirQueue * queue = initQueue();
+	printf("V%d -- ", k);
+	foundVexs[k] = 1;
+	enQueue(queue, k);
+
+	while (finder < G->n)
+	{
+		//出队访问同时将依附顶点入队
+		i = deQueue(queue);
+		for (int j = 0; j < G->n; j++)
+		{
+			if (G->edges[i][j] == 1 && !foundVexs[j])
+			{
+				printf("V%d -- ", j);
+				foundVexs[j] = 1;
+				enQueue(queue, j);
+				finder++;
+			}
+		}
+		if (isEmpty(queue))//一个朋友圈结束
+		{
+			FriendZoneCounter++;
+			printf("\nnew Zone:\n");
+			//从不在foundVexs里的顶点取顶点
+			for (int j = 0; j < G->n; j++)
+			{
+				if (foundVexs[j] != 1)
+				{
+					enQueue(queue, j);
+					break;
+				}
+			}
+		}
+	}
+	printf("\n一共有%d个朋友圈。\n", FriendZoneCounter);
+}
