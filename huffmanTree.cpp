@@ -10,6 +10,11 @@ typedef struct {
 	int parent, lchild, rchild;
 }HNode, * HTree;
 
+typedef struct {
+	char vertex;
+	int weight;
+}Table;
+
 HTree HuffmanTree(int * w, int n);//构造哈夫曼树 w:权数组首地址, n:权值个数
 char ** HuffmanCoding(HTree ht, int n);//生成哈夫曼编码,返回哈夫曼编码二维字符数组首地址 ht:HTree类型指针, n: 权个数
 char * compress(char ** hfmCode, int n);//用哈夫曼编码压缩, hfmCode:哈夫曼编码串首地址, n:权值个数
