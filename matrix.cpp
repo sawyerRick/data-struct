@@ -1,229 +1,197 @@
-//矩阵1初始化，转置矩阵1，矩阵二初始化，矩阵1 + 矩阵2
-#include <stdio.h>
+#include <iostream>
+#include <iomanip>
 #include <stdlib.h>
+#include <time.h>
 
-#define MAXSIZE 100
+using namespace std;
 typedef int elemtype;
-typedef struct
-{
-	int i, j;
-	elemtype value;
-}Triple;
 
-typedef struct
-{
-	Triple data[MAXSIZE];
-	int row, column, nonZero;
-}TSMatrix;
-
-//矩阵加法采用更好用的储存方式矩阵
-typedef struct
-{
-	elemtype v;
-}TempMatrix;
-
-TSMatrix * initMatrix();
-void displayMatrix(TSMatrix * matrix);
-void displayTripleTable(TSMatrix * matrix);
-void newTranspose(TSMatrix * matrix);
-TSMatrix * transpose(TSMatrix * matrix);
-void addMatrix(TSMatrix * matrix1, TSMatrix * matrix2);
+void InitMatrix(elemtype **& Matrix, int n, int m);
+void DisplayMatrix(elemtype **& Matrix, int n, int m);
+void Transpose(elemtype **& Matrix, int n, int m, elemtype **& transposeMatrix);
+void MatrixAdd(elemtype **& Matrix1, elemtype **& Matrix2, int n, int m);
+void MatrixSub(elemtype **& Matrix1, elemtype **& Matrix2, int n, int m);
+void MatrixMul(elemtype **& Matrix1, elemtype **& Matrix2, int n1, int m1, int n2, int m2);
+void TestUnit();
 
 int main()
 {
-	printf("请初始化矩阵1...\n");
-	TSMatrix * matrix1 = initMatrix();
-	displayMatrix(matrix1);
-	newTranspose(matrix1);
-	displayMatrix(matrix1);
-	/*
-	printf("矩阵1转置前:\n");
-	displayMatrix(matrix1);
-	printf("矩阵1转置后:\n");
-	matrix1 = transpose(matrix1);
-	displayMatrix(matrix1);
-	displayTripleTable(matrix1);
-	system("pause");
-	system("CLS");
-
-	printf("请初始化矩阵2...\n");
-	TSMatrix * matrix2 = initMatrix();
-	system("pause");
-	system("CLS");
-	printf("转置后的矩阵1 + 矩阵2：\n");
-	displayMatrix(matrix2);
-	printf("    +\n");
-	displayMatrix(matrix1);
-	printf("    =\n");
-	addMatrix(matrix1, matrix2);*/
+	TestUnit();
 
 	return 0;
 }
 
-TSMatrix * initMatrix()
+void InitMatrix(elemtype **& Matrix, int n, int m)
 {
-	TSMatrix * matrix = (TSMatrix *)malloc(sizeof(TSMatrix));
-	printf("[*] 正在初始化稀疏矩阵...\n");
-	matrix->nonZero = 0;
-	printf("[+] 请输入最大行数:");
-	scanf("%d", &matrix->row);
-	printf("[+] 请输入最大列数:");
-	scanf("%d", &matrix->column);
-	printf("[+] 非零数字个数:");
-	scanf("%d", &matrix->nonZero);
-	printf("[*] 请输入行: 列: 值:  (如: 1 2 3 ==>一行二列的值为3)\n");
-	for(int i = 1; i <= matrix->nonZero; i++)
-	{
-		do
-		{
-			scanf("%d", &matrix->data[i].i);
-			scanf("%d", &matrix->data[i].j);
-			scanf("%d", &matrix->data[i].value);
-			
-			for (int k = 0; k < i; k++)
-			{
-				//判断该位置是否有数字
-				if (matrix->data[k].i == matrix->data[i].i && matrix->data[k].j == matrix->data[i].j)
-				{
-					printf("行:%d 列:%d 空间已被占...已退出程序...\n", matrix->data[i].i, matrix->data[i].j, matrix->data[i].value);
-					exit(0);
-				}
-			}
-			if(matrix->data[i].i <= 0 || matrix->data[i].i > matrix->row || matrix->data[i].j <= 0 || matrix->data[i].j > matrix->row)
-			{
-				printf("[!] 输入非法...请重新输入...\n");
-				fflush(stdin);
-			}
-		}while (matrix->data[i].i <= 0 || matrix->data[i].i > matrix->row || matrix->data[i].j <= 0 || matrix->data[i].j > matrix->row);
-		
-		printf("[+] 行:%d 列:%d 值:%d 成功保存...请继续输入...\n", matrix->data[i].i, matrix->data[i].j, matrix->data[i].value);
-	}
-	printf("[*] 稀疏矩阵初始化完毕...\n");
-	return matrix;
-}
 
-void displayMatrix(TSMatrix * matrix)
-{
-	int isFound = 0;
-	for(int i = 1; i <= matrix->row; i++)
+	for (int i = 0; i < n; i++)
 	{
-		for(int j = 1; j <= matrix->column; j++)
+		Matrix[i] = new int[m];
+	}
+
+	for (int i = 0; i < n; i++)
+	{
+
+		for (int j = 0; j < m; j++)
 		{
-			isFound = 0;
-			for (int k = 0; k <= matrix->nonZero; k++)
-			{
-				if (matrix->data[k].i == i && matrix->data[k].j == j)
-				{
-					printf("%d  ", matrix->data[k].value);
-					isFound = 1;
-					break;
-				}
-			}
-			if(!isFound)
-			{
-				printf("0  ");
-			}
+			Matrix[i][j] = rand() % 5;
 		}
-		printf("\n");
 	}
 }
 
-void displayTripleTable(TSMatrix * matrix)
+void DisplayMatrix(elemtype **& Matrix, int n, int m)
 {
-	printf("三元组表:\n");
-	printf("  | i  j  v\n");
-	for (int i = 1; i <= matrix->nonZero; i++)
+	for (int i = 0; i < n; i++)
 	{
-		printf("%d | %d  %d  %d\n", i, matrix->data[i].i, matrix->data[i].j, matrix->data[i].value);
+		for (int j = 0; j < m; j++)
+		{
+			cout << setw(5) << Matrix[i][j];
+		}
+		cout << endl;
+	}
+	cout << endl;
+}
+
+void Transpose(elemtype **& Matrix, int n, int m, elemtype **& transposeMatrix)
+{
+	transposeMatrix = new int *[m];
+	for (int i = 0; i < m; i++)
+	{
+		transposeMatrix[i] = new int[n];
+	}
+
+	for (int i = 0; i < m; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			transposeMatrix[i][j] = Matrix[j][i];
+		}
 	}
 }
 
-TSMatrix * transpose(TSMatrix * matrix)
+void MatrixAdd(elemtype **& Matrix1, elemtype **& Matrix2, int n, int m)
 {
-	int j = 0, k = 0;
-	TSMatrix * newMatrix = (TSMatrix *)malloc(sizeof(TSMatrix));
-	int * num = (int *)malloc((matrix->column + 1) * sizeof(int));
-	int * cpot = (int *)malloc((matrix->column + 1) * sizeof(int));
-	newMatrix->column = matrix->column;
-	newMatrix->row = matrix->column;
-	newMatrix->nonZero = matrix->column;	
-
-	if (newMatrix->nonZero > 0)
+	for (int i = 0; i < n; i++)
 	{
-		for (int i = 1; i <= matrix->column; i++)
+		for (int j = 0; j < m; j++)
 		{
-			num[i] = 0;
-		}
-		for (int i = 1; i <= matrix->nonZero; i++)
-		{
-			j = matrix->data[i].j;
-			num[j]++;
-		}
-		cpot[1] = 1;
-		for(int i = 2; i <= matrix->column; i++)
-		{
-			cpot[i] = cpot[i - 1] + num[i - 1];
-		}
-		for(int i = 1; i <= (matrix->nonZero); i++)
-		{
-			j = matrix->data[i].j;
-			k = cpot[j];
-			newMatrix->data[k].i = matrix->data[i].j;
-			newMatrix->data[k].j = matrix->data[i].i;
-			newMatrix->data[k].value = matrix->data[i].value;
-			cpot[j]++;
+			Matrix1[i][j] += Matrix2[i][j];
 		}
 	}
-	return newMatrix;
 }
 
-void addMatrix(TSMatrix * matrix1, TSMatrix * matrix2)
+void MatrixSub(elemtype **& Matrix1, elemtype **& Matrix2, int n, int m)
 {
-	if (matrix1->row != matrix2->row || matrix1->column != matrix2->column)
+	for (int i = 0; i < n; i++)
 	{
-		printf("不能相加的矩阵类型, 请检查...");
-		return ;
-	}
-	TempMatrix table1[MAXSIZE][MAXSIZE] = {0};
-	TempMatrix table2[MAXSIZE][MAXSIZE] = {0};
-
-	//遍历三元组表初始化TempMatrix,复杂度很低
-	for (int i = 1; i <= matrix1->nonZero; i++)
-	{
-		table1[matrix1->data[i].i][matrix1->data[i].j].v = matrix1->data[i].value;
-	}
-
-	for (int i = 1; i <= matrix2->nonZero; i++)
-	{
-		table2[matrix2->data[i].i][matrix2->data[i].j].v = matrix2->data[i].value;
-	}
-
-	//遍历TempMatrix，自加输出
-	for (int i = 1; i <= matrix1->row; i++)
-	{
-		for (int j = 1; j <= matrix1->column; j++)
+		for (int j = 0; j < m; j++)
 		{
-			if (table1[i][j].v || table2[i][j].v)
+			Matrix1[i][j] -= Matrix2[i][j];
+		}
+	}
+}
+
+void MatrixMul(elemtype **& Matrix1, elemtype **& Matrix2, int n1, int m1, int n2, int m2)
+{
+	//矩阵相乘条件:Matrix1的行数等于Matrix2的列数
+	if (n1 != m2)
+	{
+		cout << "不符合乘法条件..." << endl;
+
+		return;
+	}
+
+	//Matrix1 X Matrix2生成一个n1行m2列的矩阵Matrix3
+	elemtype ** Matrix3 = new int *[n1];
+	for (int i = 0; i < n1; i++)
+	{
+		Matrix3[i] = new int[m2];
+	}
+	int ACC = 0;
+
+	// 遍历Matrix1
+	for (int i = 0; i < n1; i++)
+	{ 
+		for (int j = 0; j < m1; j++)
+		{
+			ACC = 0;
+			// 遍历Matrix2的第k行，i列
+			for (int k = 0; k < m2; k++)
 			{
-				table1[i][j].v += table2[i][j].v;
-				printf("%d  ", table1[i][j].v);
+				ACC += Matrix1[i][j] * Matrix2[k][i];
 			}
-			else
-			{
-				printf("0  ");
-			}
+			Matrix3[i][j] = ACC;
 		}
-		printf("\n");
 	}
+
+	delete []Matrix1;
+	Matrix1 = Matrix3;
 }
 
-void newTranspose(TSMatrix * matrix)
+void TestUnit()
 {
-	int temp = 0;
-	for (int i = 0; i <= matrix->nonZero; i++)
+	int n1 = 0;
+	int m1 = 0;
+	int n2 = 0;
+	int m2 = 0;
+	cout << "请输入矩阵M1行数列数 n1 m1:" << endl;
+	cin >> n1 >> m1;
+	cout << "请输入矩阵M2行数列数 n2 m2:" << endl;
+	cin >> n2 >> m2;
+	
+	if (n1 <= 0 || m1 <= 0)
 	{
-		temp = matrix->data[i].i;
-		matrix->data[i].i = matrix->data[i].j;
-		matrix->data[i].j = temp;
+		cout << "非法输入...已退出..." << endl;
+
+		return;
 	}
+
+	//初始化矩阵
+	elemtype ** Matrix1 = new int *[n1];
+	elemtype ** Matrix2 = new int *[n2];
+	srand((unsigned)time(NULL));
+	InitMatrix(Matrix1, n1, m1);
+	InitMatrix(Matrix2, n2, m2);
+	cout << "生成矩阵M1:" << endl;
+	DisplayMatrix(Matrix1, n1, m1);
+	cout << "生成矩阵M2:" << endl;
+	DisplayMatrix(Matrix2, n2, m2);
+	
+	if (n1 == n2 && m1 == m2)
+	{
+		cout << "M1 + M2:" << endl;
+		MatrixAdd(Matrix1, Matrix2, n1, m1);
+		DisplayMatrix(Matrix1, n1, m1);
+
+		cout << "M1 - M2:" << endl;
+		MatrixSub(Matrix1, Matrix2, n1, m1);
+		DisplayMatrix(Matrix1, n1, m1);
+	}
+	else
+	{
+		cout << "M1 M2 行列数不相等，不能做加减运算..." << endl;
+	}
+	
+	if (n1 == m2)
+	{
+		cout << "M1 X M2:" << endl;
+		MatrixMul(Matrix1, Matrix2, n1, m1, n2, m2);
+		DisplayMatrix(Matrix1, n1, m1);
+	}
+	else
+	{
+		cout << "M1行数不等于M2列数，不能做乘法运算..." << endl;
+	}
+
+	//矩阵转置
+	cout << "转置前:" << endl;
+	DisplayMatrix(Matrix1, n1, m1);
+	cout << "转置后:" << endl;
+	elemtype ** transposeMatrix;
+	Transpose(Matrix1, n1, m1, transposeMatrix);
+	DisplayMatrix(transposeMatrix, m1, n1);
+
+	delete[]Matrix1;
+	delete[]Matrix2;
+	delete []transposeMatrix;
 }
